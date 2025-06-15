@@ -15,6 +15,7 @@ import { FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const { getUser } = useKindeBrowserClient();
@@ -75,18 +76,26 @@ const Navbar = () => {
         {/* Logo and Desktop NavLinks */}
         <div className="flex items-center gap-8 md:gap-12">
           <Link href="/" className="flex items-center">
-            <h1 className="text-2xl sm:text-3xl font-semibold">
+            {/* <h1 className="text-2xl sm:text-3xl font-semibold">
               Smart
               <span className="text-blue-500 font-bold">Farmer</span>
-            </h1>
+            </h1> */}
+            <Image
+              src="/logo.png"
+              alt="Smart Farmer Logo"
+              width={150}
+              height={40}
+              className="h-10 sm:h-12 object-contain"
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
             <NavLink href="/">Home</NavLink>
+            <NavLink href="/products">Marketplace</NavLink>
             <NavLink href="/dashboard">Dashboard</NavLink>
-            <NavLink href="/products">MarketPlace</NavLink>
-            <NavLink href="/my-products">My Products</NavLink>
           </div>
+
+          <SearchBar />
         </div>
 
         {/* Mobile Menu Button */}
@@ -181,9 +190,11 @@ const Navbar = () => {
                                 className="flex items-center gap-4 p-4 hover:bg-blue-50/50 transition-colors"
                               >
                                 <div className="relative w-16 h-16 flex-shrink-0">
-                                  <img
+                                  <Image
                                     src={item.imageUrl}
                                     alt={item.title}
+                                    width={64}
+                                    height={64}
                                     className="w-full h-full object-cover rounded-lg border border-gray-200"
                                   />
                                   <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -478,9 +489,11 @@ const Navbar = () => {
                         className="flex items-center gap-4 p-4 hover:bg-blue-50/50 transition-colors"
                       >
                         <div className="relative w-16 h-16 flex-shrink-0">
-                          <img
+                          <Image
                             src={item.imageUrl}
                             alt={item.title}
+                            width={64}
+                            height={64}
                             className="w-full h-full object-cover rounded-lg border border-gray-200"
                           />
                           <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">

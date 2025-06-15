@@ -2,6 +2,15 @@ export type ParamsProps = Promise<{
   id: string;
 }>;
 
+export type UpdateProductDto = {
+  title?: string;
+  description?: string;
+  price?: number;
+  imageUrl?: string;
+  stock?: number;
+  categoryId?: string;
+};
+
 export interface Product {
   id: string;
   title: string;
@@ -24,3 +33,13 @@ export type CartAction =
   | { type: "INCREMENT_QTY"; productId: string }
   | { type: "DECREMENT_QTY"; productId: string }
   | { type: "CLEAR_CART" };
+
+export type ActivityProps = {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  createdAt: string | Date;
+  type?: string;
+  status?: string;
+};

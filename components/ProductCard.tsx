@@ -1,10 +1,15 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
+import { Product } from "@/lib/generated/prisma";
+import { formatPrice } from "@/utils";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
 
-const ProductCard = ({ product, owner }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ProductCard = ({ product, owner }: { product: Product; owner: any }) => {
   const ownerId = product.ownerId;
 
   const { getUser } = useKindeBrowserClient();
@@ -16,7 +21,7 @@ const ProductCard = ({ product, owner }) => {
 
   const isOwner = user?.id === ownerId;
 
-  const addToCart = async (product) => {
+  const addToCart = async (product: Product) => {
     try {
       // Add product to backend cart
       const res = await fetch("/api/user/cart", {
@@ -32,10 +37,12 @@ const ProductCard = ({ product, owner }) => {
       const data = await updatedCart.json();
 
       const items =
-        data.cart?.[0]?.cartItems.map(({ product, quantity }) => ({
-          ...product,
-          quantity,
-        })) || [];
+        data.cart?.[0]?.cartItems.map(
+          ({ product, quantity }: { product: Product; quantity: number }) => ({
+            ...product,
+            quantity,
+          })
+        ) || [];
 
       dispatch({ type: "SET_CART", items });
     } catch (err) {
@@ -50,15 +57,18 @@ const ProductCard = ({ product, owner }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative h-60 overflow-hidden">
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className={`w-full h-full object-cover transition-transform duration-700 ${
-            isHovered ? "scale-110" : "scale-100"
-          }`}
-        />
+        <Link href={`/products/${product.id}`}>
+          <Image
+            src={product.imageUrl}
+            alt={product.title}
+            fill
+            className={`w-full h-full object-cover transition-transform duration-700 ${
+              isHovered ? "scale-110" : "scale-100"
+            }`}
+          />
+        </Link>
         <div className="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full font-bold text-sm shadow-md">
-          Ksh {product.price.toLocaleString()}
+          {formatPrice(product.price)}
         </div>
       </div>
 
@@ -73,11 +83,12 @@ const ProductCard = ({ product, owner }) => {
         {owner && (
           <div className="flex items-center gap-3 mb-4">
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden border-2 border-indigo-200">
+              <div className="w-10 h-10 relative rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden border-2 border-indigo-200">
                 {owner.picture ? (
-                  <img
+                  <Image
                     src={owner.picture}
                     alt={owner.first_name}
+                    fill
                     className="w-full h-full object-cover"
                   />
                 ) : (

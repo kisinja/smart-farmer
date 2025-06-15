@@ -2,23 +2,21 @@
 import { getAccessToken } from "./getAccessToken";
 
 export const getUser = async (id: string) => {
-  const token = await getAccessToken();
-
-  const res = await fetch(
-    `https://ojmarket.kinde.com/api/v1/user?id=${id}`,
-    {
+  try {
+    const token = await getAccessToken();
+    const res = await fetch(`https://ojmarket.kinde.com/api/v1/user?id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
-  );
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    console.error("Error fetching user data:", data);
-    throw new Error("Failed to fetch user");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
   }
-
-  return data;
 };

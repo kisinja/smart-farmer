@@ -3,16 +3,14 @@ import ProductCard from "@/components/ProductCard";
 import { FiFilter, FiGrid, FiList, FiPackage } from "react-icons/fi";
 import myPrismaClient from "@/utils/connect";
 import { getUser } from "@/utils/kinde/getUser";
+import { redirect } from "next/navigation";
 
 const ProductsPage = async () => {
-  // Fetch products from your API or database
   const products = await myPrismaClient.product.findMany({
     include: {
       category: true,
     },
-  }); // Implement your data fetching
-
-  console.log(products);
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
@@ -29,7 +27,7 @@ const ProductsPage = async () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Filters Sidebar - Hidden on mobile by default */}
+          {/* Filters Sidebar */}
           <div className="md:w-1/4">
             <div className="bg-white rounded-xl shadow-md p-6 sticky top-4">
               <div className="flex items-center justify-between mb-6">
@@ -38,10 +36,8 @@ const ProductsPage = async () => {
                   <FiFilter className="w-5 h-5" />
                 </button>
               </div>
-
-              {/* External Filter Component */}
               <ProductFilters />
-
+              {/* You may remove this button or keep it as a dummy */}
               <button className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors">
                 Apply Filters
               </button>
@@ -70,7 +66,6 @@ const ProductsPage = async () => {
                     <FiList className="w-5 h-5" />
                   </button>
                 </div>
-
                 <select className="border rounded-lg px-3 py-2 text-sm">
                   <option>Sort by: Featured</option>
                   <option>Price: Low to High</option>
@@ -81,34 +76,30 @@ const ProductsPage = async () => {
               </div>
             </div>
 
-            {/* Products Grid */}
+            {/* Products List */}
             {products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map(async (product) => {
-                  const owner = await getUser(product.ownerId);
-                  return (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      owner={owner}
-                    />
-                  );
-                })}
+                {await Promise.all(
+                  products.map(async (product) => {
+                    const owner = await getUser(product.ownerId);
+                    return (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        owner={owner}
+                      />
+                    );
+                  })
+                )}
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-sm p-12 text-center">
                 <div className="mx-auto w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-400 mb-4">
                   <FiPackage className="text-3xl" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No products found
+                  </h3>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No products found
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  Try adjusting your filters or check back later
-                </p>
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">
-                  Clear Filters
-                </button>
               </div>
             )}
 

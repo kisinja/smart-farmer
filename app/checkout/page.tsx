@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FiLoader,
@@ -8,32 +8,20 @@ import {
   FiShoppingBag,
   FiMapPin,
   FiUser,
-  FiMail,
   FiCreditCard,
 } from "react-icons/fi";
 import { useCart } from "@/context/CartContext";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { toast } from "react-hot-toast";
+import PaystackPayment from "@/components/PaystackPayment";
+import Image from "next/image";
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const [form, setForm] = useState({
-    fullName: "",
-    address: "",
-    city: "",
-    country: "",
-    email: "",
-    phone: "",
-    paymentMethod: "mpesa", // Default to M-Pesa for Kenya
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const {getUser} = useKindeBrowserClient();
+  const { getUser } = useKindeBrowserClient();
   const user = getUser();
 
-  // Mock cart data - replace with your actual cart context/state
-  const {state} = useCart();
+  const { state } = useCart();
   const cartItems = state.items || [];
 
   const totalAmount = cartItems.reduce(
@@ -41,48 +29,65 @@ const CheckoutPage = () => {
     0
   );
 
+  const [form, setForm] = useState({
+    fullName: "",
+    address: "",
+    city: "",
+    country: "Kenya",
+    email: "",
+    phone: "",
+    paymentMethod: "paystack",
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        fullName: `${user.given_name || ""} ${user.family_name || ""}`,
+        email: user.email || "",
+      }));
+    }
+  }, [user]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const placeOrder = async (paystackReference: string) => {
     setIsLoading(true);
-
     try {
-      // Prepare order data matching your Prisma model
-      const orderData = {
-        buyerId: user?.id, // Replace with actual user ID from auth
-        orderItems: cartItems.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-        shippingInfo: form,
-        totalAmount,
-        paymentMethod: form.paymentMethod,
-      };
-
-      const res = await fetch("/api/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          buyerId: user?.id,
+          orderItems: cartItems,
+          shippingInfo: form,
+          totalAmount: totalAmount + 200,
+          paymentMethod: form.paymentMethod,
+          paystackReference,
+        }),
       });
 
-      const data = await res.json();
+      const result = await response.json();
 
-      if (!res.ok) throw new Error(data.error || "Order creation failed");
-
-      // Show success state briefly before redirect
-      setIsSuccess(true);
-      setTimeout(() => {
-        router.push(`/order-success?id=${data.orderId}`);
-      }, 1500);
-    } catch (err: any) {
-      alert(err.message);
+      if (response.ok) {
+        toast.success("Order created successfully");
+        setIsSuccess(true);
+        router.push(
+          `/order-success?ids=${result.orders.map((o: any) => o.id).join(",")}`
+        );
+      } else {
+        throw new Error(result.error || "Order failed");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -97,8 +102,7 @@ const CheckoutPage = () => {
             Order Placed Successfully!
           </h1>
           <p className="text-gray-600 mb-6">
-            Your order has been received and is being processed. You'll receive
-            a confirmation shortly.
+            Your order has been received and is being processed.
           </p>
           <div className="animate-spin">
             <FiLoader className="w-8 h-8 text-indigo-600 mx-auto" />
@@ -121,169 +125,96 @@ const CheckoutPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Shipping & Payment Form */}
+          {/* Checkout Form */}
           <div className="bg-white rounded-xl shadow-md p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Personal Information */}
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              {/* Personal Info */}
               <div>
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <FiUser className="text-indigo-600" />
                   Personal Information
                 </h2>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="John Doe"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="your@email.com"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="07XX XXX XXX"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={form.fullName}
+                    onChange={handleChange}
+                    placeholder="John Doe"
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="email@example.com"
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="07XX XXX XXX"
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  />
                 </div>
               </div>
 
-              {/* Shipping Address */}
+              {/* Shipping */}
               <div>
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <FiMapPin className="text-indigo-600" />
                   Shipping Address
                 </h2>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Street Address
-                    </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={form.address}
+                    onChange={handleChange}
+                    placeholder="123 Main Street"
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
                     <input
                       type="text"
-                      name="address"
-                      placeholder="123 Main Street"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      name="city"
+                      value={form.city}
                       onChange={handleChange}
+                      placeholder="City"
                       required
+                      className="border border-gray-300 rounded-lg px-4 py-3"
                     />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        placeholder="Nairobi"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Country
-                      </label>
-                      <input
-                        type="text"
-                        name="country"
-                        placeholder="Kenya"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      name="country"
+                      value={form.country}
+                      onChange={handleChange}
+                      placeholder="Country"
+                      required
+                      className="border border-gray-300 rounded-lg px-4 py-3"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Payment Method */}
+              {/* Payment */}
               <div>
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <FiCreditCard className="text-indigo-600" />
                   Payment Method
                 </h2>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:border-indigo-500 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="mpesa"
-                      checked={form.paymentMethod === "mpesa"}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <span className="block font-medium">M-Pesa</span>
-                      <span className="block text-sm text-gray-500">
-                        Pay via M-Pesa mobile money
-                      </span>
-                    </div>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:border-indigo-500 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="card"
-                      checked={form.paymentMethod === "card"}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <span className="block font-medium">
-                        Credit/Debit Card
-                      </span>
-                      <span className="block text-sm text-gray-500">
-                        Pay with Visa or Mastercard
-                      </span>
-                    </div>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:border-indigo-500 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cash"
-                      checked={form.paymentMethod === "cash"}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <span className="block font-medium">
-                        Cash on Delivery
-                      </span>
-                      <span className="block text-sm text-gray-500">
-                        Pay when you receive your order
-                      </span>
-                    </div>
-                  </label>
-                </div>
+                <PaystackPayment
+                  email={form.email}
+                  amount={totalAmount + 200}
+                  onSuccess={(reference) => placeOrder(reference)}
+                />
               </div>
             </form>
           </div>
@@ -301,9 +232,11 @@ const CheckoutPage = () => {
                   key={item.id}
                   className="flex items-center gap-4 pb-4 border-b border-gray-100"
                 >
-                  <img
+                  <Image
                     src={item.imageUrl}
                     alt={item.title}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 object-cover rounded-lg"
                   />
                   <div className="flex-1">
@@ -333,24 +266,6 @@ const CheckoutPage = () => {
                 <span className="text-indigo-600">KES {totalAmount + 200}</span>
               </div>
             </div>
-
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition-colors ${
-                isLoading ? "opacity-75 cursor-not-allowed" : ""
-              }`}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <FiLoader className="animate-spin" />
-                  Processing Order...
-                </span>
-              ) : (
-                "Complete Purchase"
-              )}
-            </button>
 
             <p className="text-xs text-gray-500 mt-3 text-center">
               By placing your order, you agree to our Terms of Service and

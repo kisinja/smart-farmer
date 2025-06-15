@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function AddProductPage() {
-  const router = useRouter();
+  //const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -168,9 +169,11 @@ export default function AddProductPage() {
               {form.imageUrl && (
                 <div className="mt-2">
                   <p className="text-xs text-indigo-500 mb-1">Image Preview:</p>
-                  <img
+                  <Image
                     src={form.imageUrl}
                     alt="Preview"
+                    width={80}
+                    height={80}
                     className="h-20 w-20 object-cover rounded border border-indigo-100"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";

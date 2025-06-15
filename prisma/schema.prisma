@@ -30,6 +30,7 @@ model Product {
   price       Float
   imageUrl    String
   stock       Int    @default(0)
+  views       Int    @default(0)
 
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String   @db.ObjectId
@@ -59,10 +60,12 @@ model Category {
 model Order {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
   buyerId       String
+  sellerId       String
   orderItems    OrderItem[]
   shippingInfo  ShippingInfo @relation(fields: [shippingInfoId], references: [id])
   shippingInfoId String      @db.ObjectId 
   paymentMethod String
+  paymentReference String?
   totalAmount   Float
   status        String       @default("PENDING") // PENDING, SHIPPED, DELIVERED, CANCELLED
   trackingNumber String?
