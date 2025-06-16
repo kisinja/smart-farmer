@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import myPrismaClient from "@/utils/connect";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { buyerId, orderItems, shippingInfo, totalAmount, paymentMethod, paymentReference } = body;
+    const { buyerId, orderItems, shippingInfo, paymentMethod, paymentReference } = body;
 
     if (!buyerId || !orderItems || orderItems.length === 0 || !shippingInfo || !paymentMethod) {
       return NextResponse.json(

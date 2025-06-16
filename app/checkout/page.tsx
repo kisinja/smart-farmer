@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -199,6 +200,7 @@ const CheckoutPage = () => {
                       placeholder="Country"
                       required
                       className="border border-gray-300 rounded-lg px-4 py-3"
+                      disabled={isLoading}
                     />
                   </div>
                 </div>

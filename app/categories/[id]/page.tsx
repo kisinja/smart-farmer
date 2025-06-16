@@ -2,6 +2,7 @@ import ProductCard from "@/components/ProductCard";
 import { ParamsProps } from "@/types";
 import myPrismaClient from "@/utils/connect";
 import { getUser } from "@/utils/kinde/getUser";
+import Image from "next/image";
 import React from "react";
 
 const CategoryPage = async ({ params }: { params: ParamsProps }) => {
@@ -25,9 +26,11 @@ const CategoryPage = async ({ params }: { params: ParamsProps }) => {
       {/* Category Hero Section */}
       <div className="relative h-64 w-full overflow-hidden bg-indigo-900">
         {imageUrl && (
-          <img
+          <Image
             src={imageUrl}
             alt={name}
+            fill
+            sizes="100vw"
             className="w-full h-full object-cover opacity-70"
           />
         )}

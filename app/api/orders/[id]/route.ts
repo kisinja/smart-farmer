@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Get order details by ID
 export async function GET(
-  req: NextRequest,
   { params }: { params: ParamsProps }
 ) {
   const { getUser } = getKindeServerSession();

@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { FiX } from "react-icons/fi";
 
 const DeleteConfirmationModal = ({
   isOpen,

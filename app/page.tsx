@@ -1,5 +1,6 @@
 import CategoryGrid from "@/components/CategoryGrid";
 import myPrismaClient from "@/utils/connect";
+import Link from "next/link";
 import React from "react";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -28,12 +29,12 @@ const HomePage = async () => {
             <p className="text-xl text-indigo-100 mb-8">
               Direct from local farmers to your table
             </p>
-            <a 
+            <Link 
               href="#categories" 
               className="inline-flex items-center gap-2 bg-white text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-full font-medium transition-colors"
             >
               Browse Categories <FiArrowRight className="mt-0.5" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -57,24 +58,24 @@ const HomePage = async () => {
           {/* Call to Action */}
           <div className="bg-white rounded-xl shadow-md p-8 sm:p-10 text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Can't find what you're looking for?
+              Can&quot;t find what you&quot;re looking for?
             </h3>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               Our farmers add new products daily. Check back soon or contact us for special requests.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a 
+              <Link 
                 href="/products" 
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 View All Products
-              </a>
-              <a 
+              </Link>
+              <Link 
                 href="/contact" 
                 className="bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium border transition-colors"
               >
                 Contact Farmers
-              </a>
+              </Link>
             </div>
           </div>
         </div>

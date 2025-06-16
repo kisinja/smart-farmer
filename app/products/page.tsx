@@ -3,12 +3,15 @@ import ProductCard from "@/components/ProductCard";
 import { FiFilter, FiGrid, FiList, FiPackage } from "react-icons/fi";
 import myPrismaClient from "@/utils/connect";
 import { getUser } from "@/utils/kinde/getUser";
-import { redirect } from "next/navigation";
+
 
 const ProductsPage = async () => {
   const products = await myPrismaClient.product.findMany({
     include: {
       category: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 

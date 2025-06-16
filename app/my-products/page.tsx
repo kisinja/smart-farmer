@@ -1,5 +1,7 @@
 "use client";
+import { Product } from "@/lib/generated/prisma";
 import myPrismaClient from "@/utils/connect";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
@@ -13,7 +15,7 @@ import {
 } from "react-icons/fi";
 
 const MyProductsPage = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const MyProductsPage = () => {
     fetchProducts();
   }, []);
 
-  const handleDelete = async (productId:string) => {
+  const handleDelete = async (productId: string) => {
     if (!confirm("Delete this product permanently?")) return;
     try {
       const deleteRes = await myPrismaClient.product.delete({
@@ -82,9 +84,11 @@ const MyProductsPage = () => {
                 {/* Product Image */}
                 <div className="relative h-52 bg-indigo-50 overflow-hidden">
                   {product.imageUrl ? (
-                    <img
+                    <Image
                       src={product.imageUrl}
                       alt={product.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -169,8 +173,8 @@ const MyProductsPage = () => {
               No products listed
             </h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              You haven't created any products yet. Start selling by adding your
-              first product.
+              You haven&apos;t created any products yet. Start selling by adding
+              your first product.
             </p>
             <Link
               href="/products/new"

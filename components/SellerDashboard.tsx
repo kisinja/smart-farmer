@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Image from "next/image";
@@ -12,7 +13,6 @@ import {
   FiTruck,
   FiUser,
   FiXCircle,
-  FiSave,
   FiChevronDown,
   FiCalendar,
 } from "react-icons/fi";
@@ -424,7 +424,7 @@ const SellerDashboard = ({
                   </button>
                 </div>
                 <div className="space-y-4">
-                  {recentActivity.map((activity, index) => (
+                  {recentActivity.map((activity:any, index:number) => (
                     <motion.div
                       key={activity.id || index}
                       initial={{ opacity: 0, x: -20 }}
@@ -520,12 +520,12 @@ const SellerDashboard = ({
                   No orders yet
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Your products haven't received any orders yet. Keep promoting!
+                  Your products haven&quot;t received any orders yet. Keep promoting!
                 </p>
               </div>
             ) : (
               <div className="space-y-4 h-[500px] overflow-y-scroll" id="orders-section">
-                {orders.map((order) => {
+                {orders.map((order:any) => {
                   const isUpdating = updatingOrders.includes(order.id);
                   const hasError = errorOrders.includes(order.id);
                   const orderDate = new Date(order.createdAt);
@@ -542,7 +542,7 @@ const SellerDashboard = ({
                   // Safely calculate total items
                   const totalItems =
                     order.orderItems?.reduce(
-                      (sum, item) => sum + (item.quantity || 0),
+                      (sum:any, item:any) => sum + (item.quantity || 0),
                       0
                     ) || 0;
 
@@ -626,7 +626,7 @@ const SellerDashboard = ({
                             </h3>
                             <div className="flex flex-wrap gap-2">
                               {order.orderItems?.slice(0, 4).map(
-                                (item) =>
+                                (item:any) =>
                                   item?.product && (
                                     <div
                                       key={item.id}
@@ -895,7 +895,7 @@ const SellerDashboard = ({
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredProducts.length > 0 ? (
-                      filteredProducts.map((product, i) => (
+                      filteredProducts.map((product:any, i:number) => (
                         <motion.tr
                           key={product.id}
                           initial={{ opacity: 0 }}
