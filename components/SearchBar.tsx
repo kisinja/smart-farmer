@@ -7,9 +7,9 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search..."
-          className="w-0 p-0 border-none opacity-0 transition-all duration-500 group-hover:w-64 group-hover:p-2 group-hover:opacity-100 group-hover:ml-2 focus:outline-none rounded-full"
+          className="w-0 p-0 border-none opacity-0 transition-all duration-500 group-hover:w-64 group-hover:p-2 group-hover:opacity-100 group-hover:pl-3  focus:outline-none rounded-full"
         />
-        <button className="p-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-700 transition-colors duration-500 shadow-md transform hover:scale-105">
+        <button className="p-1 border-3 border-gray-400 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-700 transition-colors duration-500 shadow-md transform hover:scale-105 group-hover:border-orange-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"

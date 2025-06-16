@@ -124,3 +124,12 @@
 html{
   scroll-behavior: smooth;
 }
+
+/* Hide scrollbar for this section */
+#orders-section::-webkit-scrollbar {
+  display: none;
+}
+#orders-section {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

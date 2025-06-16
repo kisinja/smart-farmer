@@ -8,21 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId  String    @unique // Unique identifier from Kinde
-  email    String    @unique
-  name     String?
-  imageUrl String?
-  role     String    @default("USER")
-  products Product[] // Products created by the user
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  orders Order[]
-} */
-
 model Product {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   title       String

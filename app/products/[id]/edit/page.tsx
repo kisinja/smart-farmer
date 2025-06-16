@@ -7,7 +7,6 @@ import {
   FiX,
   FiUpload,
   FiImage,
-  FiDollarSign,
   FiBox,
 } from "react-icons/fi";
 import { Category, Product } from "@/lib/generated/prisma";
@@ -326,7 +325,7 @@ export default function EditProduct() {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                      <FiDollarSign />
+                      KES
                     </div>
                     <input
                       type="number"
@@ -339,7 +338,7 @@ export default function EditProduct() {
                           price: parseFloat(e.target.value),
                         })
                       }
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       required
                     />
                   </div>

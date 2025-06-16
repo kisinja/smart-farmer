@@ -291,6 +291,13 @@ const Navbar = () => {
                     Signed in as{" "}
                     <span className="font-medium">{user.given_name}</span>
                   </h3>
+                  <Link
+                    href="/user/dashboard"
+                    className='text-sm text-blue-600 hover:text-blue-800'
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    User Dashboard
+                  </Link>
                   <LogoutLink
                     className={buttonVariants({
                       variant: "destructive",

@@ -1,4 +1,4 @@
-import UserDashboard from "@/components/UserDashboard";
+import SellerDashboard from "@/components/SellerDashboard";
 import myPrismaClient from "@/utils/connect";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import React from "react";
@@ -46,7 +46,7 @@ const DashboardPage = async () => {
   console.log(user);
   return (
     <div>
-      <UserDashboard
+      <SellerDashboard
         userProducts={userProducts ? userProducts : []}
         categories={categories ? categories : []}
         pendingOrders={orders ? orders.length :0}

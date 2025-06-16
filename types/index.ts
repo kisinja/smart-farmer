@@ -1,3 +1,4 @@
+
 export type ParamsProps = Promise<{
   id: string;
 }>;
@@ -42,4 +43,26 @@ export type ActivityProps = {
   createdAt: string | Date;
   type?: string;
   status?: string;
+};
+
+export type StatCardProps = {
+  // icon <FaIcon /> or string
+  icon: React.ReactNode;
+  title: string;
+  value: number | string;
+  color?: string;
+}
+
+export type OrderCardProps = {
+  order: {
+    order: {
+      id: string;
+      createdAt: string | Date;
+      status: "PENDING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+      totalAmount: number;
+      trackingNumber?: string;
+
+    };
+    orderItems: number;
+  };
 };
