@@ -11,6 +11,9 @@ export async function GET() {
       where: {
         ownerId: user?.id,
       },
+      include:{
+        category: true,
+      },
       orderBy: {
         createdAt: "desc",
       },

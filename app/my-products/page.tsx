@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Product } from "@/lib/generated/prisma";
 import myPrismaClient from "@/utils/connect";
@@ -76,7 +77,7 @@ const MyProductsPage = () => {
           </div>
         ) : products.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {products.map((product:any) => (
               <div
                 key={product.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
