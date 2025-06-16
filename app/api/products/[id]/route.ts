@@ -56,10 +56,11 @@ export async function PUT(
 }
 
 export async function GET(
+  request: Request,
   { params }: { params: ParamsProps }
 ) {
   try {
-    const productId = (await params).id;
+    const productId = (await params).id; // no need for await here
     const product = await myPrismaClient.product.findUnique({
       where: { id: productId },
       include: {
@@ -71,7 +72,6 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Get owner info
     let owner = null;
     try {
       owner = await getUser(product.ownerId);
@@ -83,7 +83,7 @@ export async function GET(
       ...product,
       owner: {
         name: owner?.first_name
-          ? `${owner?.first_name} ${owner?.last_name}`
+          ? `${owner.first_name} ${owner.last_name}`
           : "Unknown Seller",
         imageUrl: owner?.picture,
       },
