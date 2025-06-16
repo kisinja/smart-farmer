@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import myPrismaClient from "@/utils/connect";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
@@ -25,7 +26,7 @@ export async function GET() {
       { success: true, orders: sellerOrders },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
