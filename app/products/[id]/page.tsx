@@ -14,7 +14,7 @@ import {
 import ProductViewTracker from "@/components/ProductViewTracker";
 import { formatPrice } from "@/utils";
 import { toast } from "react-hot-toast";
-import { Category } from "@/lib/generated/prisma";
+import { Category, Product } from "@/lib/generated/prisma";
 
 type ProductWithOwner = Product & {
   owner?: {

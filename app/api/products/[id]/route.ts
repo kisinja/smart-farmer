@@ -6,12 +6,13 @@ import { NextResponse } from "next/server";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: ParamsProps }
 ) {
   try {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
     const body: UpdateProductDto = await request.json();
+    const productId = (await params).id;
 
     // Validate at least one field is being updated
     if (Object.keys(body).length === 0) {
@@ -38,7 +39,7 @@ export async function PUT(
 
     const updatedProduct = await myPrismaClient.product.update({
       where: {
-        id: params.id,
+        id: productId,
         ownerId: user?.id,
       },
       data: body, // Prisma automatically ignores undefined values
@@ -55,11 +56,10 @@ export async function PUT(
 }
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: ParamsProps }
 ) {
   try {
-    const productId = params.id;
+    const productId = (await params).id;
     const product = await myPrismaClient.product.findUnique({
       where: { id: productId },
       include: {
