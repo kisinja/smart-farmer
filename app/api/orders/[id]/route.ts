@@ -4,7 +4,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get order details by ID
-export async function GET(
+/* export async function GET(
   { params }: { params: ParamsProps }
 ) {
   const { getUser } = getKindeServerSession();
@@ -44,7 +44,7 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+} */
 
 // Update order status
 export async function PATCH(
