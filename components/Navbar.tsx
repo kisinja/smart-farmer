@@ -11,11 +11,10 @@ import {
 import Image from "next/image";
 import CustomDropdown from "./CustomDropdown";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import { FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
+import { FiShoppingBag, FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
-import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const { getUser } = useKindeBrowserClient();
@@ -23,6 +22,7 @@ const Navbar = () => {
 
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +37,7 @@ const Navbar = () => {
     user?.picture ||
     "https://i.pinimg.com/474x/6e/59/95/6e599501252c23bcf02658617b29c894.jpg";
 
-  // Close cart modal when clicking outside
+  // Close modals when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
@@ -71,15 +71,23 @@ const Navbar = () => {
   }, [mobileMenuOpen]);
 
   return (
-    <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-4 px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo and Desktop NavLinks */}
-        <div className="flex items-center gap-8 md:gap-12">
+        {/* Logo and Mobile Menu Button */}
+        <div className="flex items-center gap-4">
+          <button
+            aria-label="Mobile menu"
+            className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <FiX className="h-6 w-6" />
+            ) : (
+              <FiMenu className="h-6 w-6" />
+            )}
+          </button>
+
           <Link href="/" className="flex items-center">
-            {/* <h1 className="text-2xl sm:text-3xl font-semibold">
-              Smart
-              <span className="text-blue-500 font-bold">Farmer</span>
-            </h1> */}
             <Image
               src="/logo.png"
               alt="Smart Farmer Logo"
@@ -88,30 +96,37 @@ const Navbar = () => {
               className="h-10 sm:h-12 object-contain"
             />
           </Link>
-
-          <div className="hidden md:flex items-center gap-6">
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/products">Marketplace</NavLink>
-            <NavLink href="/dashboard">Dashboard</NavLink>
-          </div>
-
-          <SearchBar />
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
+          <NavLink href="/">Home</NavLink>
+          <NavLink href="/products">Marketplace</NavLink>
+          <NavLink href="/dashboard">Dashboard</NavLink>
+        </div>
+
+        {/* Search Button - Mobile */}
         <button
-          aria-label="Mobile menu"
-          className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 rounded-full hover:bg-gray-100"
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search"
         >
-          {mobileMenuOpen ? (
-            <FiX className="h-6 w-6" />
-          ) : (
-            <FiMenu className="h-6 w-6" />
-          )}
+          <FiSearch className="h-5 w-5 text-gray-700" />
         </button>
 
-        {/* Authenticated Section */}
+        {/* Desktop Search Bar */}
+        <div className="hidden md:block flex-1 max-w-md mx-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <FiSearch className="absolute right-3 top-2.5 text-gray-400" />
+          </div>
+        </div>
+
+        {/* Desktop User Actions */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <>
@@ -123,97 +138,77 @@ const Navbar = () => {
                   aria-label="Shopping cart"
                 >
                   <FiShoppingBag className="text-xl text-gray-700" />
-                  {state.items.length > 0 && (
+                  {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
                 </button>
 
+                {/* Cart Dropdown */}
                 <AnimatePresence>
                   {cartOpen && (
                     <motion.div
                       ref={cartRef}
-                      key="cart-modal"
-                      initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                      transition={{
-                        type: "spring",
-                        damping: 25,
-                        stiffness: 300,
-                      }}
-                      className="absolute top-6 right-0 w-96 bg-white shadow-2xl rounded-xl border border-gray-100 z-50"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
                     >
                       {/* Cart Header */}
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-xl font-bold flex items-center gap-2">
-                            <FiShoppingBag className="text-white" />
-                            Your Shopping Cart
-                          </h3>
-                          <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-semibold">
-                            {cartCount} {cartCount === 1 ? "item" : "items"}
-                          </span>
-                        </div>
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 text-white rounded-t-lg">
+                        <h3 className="font-bold flex items-center gap-2">
+                          <FiShoppingBag />
+                          Your Cart ({cartCount})
+                        </h3>
                       </div>
 
                       {/* Cart Items */}
-                      <div className="max-h-96 overflow-y-auto">
+                      <div className="max-h-96 overflow-y-auto p-3">
                         {state.items.length === 0 ? (
-                          <div className="p-6 text-center">
-                            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                              <FiShoppingBag className="text-blue-500 text-2xl" />
-                            </div>
-                            <p className="text-gray-600 font-medium">
-                              Your cart is empty
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              Start shopping to add items
-                            </p>
+                          <div className="text-center py-4">
+                            <FiShoppingBag className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+                            <p className="text-gray-600">Your cart is empty</p>
                             <Link
                               href="/products"
-                              className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                              className="inline-block mt-2 text-blue-600 hover:text-blue-800 text-sm"
                               onClick={() => setCartOpen(false)}
                             >
-                              Browse Products
+                              Browse products
                             </Link>
                           </div>
                         ) : (
-                          <div className="divide-y divide-gray-100">
+                          <div className="space-y-3">
                             {state.items.map((item) => (
-                              <motion.div
+                              <div
                                 key={item.id}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                className="flex items-center gap-4 p-4 hover:bg-blue-50/50 transition-colors"
+                                className="flex gap-3 items-start border-b border-gray-100 pb-3"
                               >
-                                <div className="relative w-16 h-16 flex-shrink-0">
+                                <div className="relative">
                                   <Image
                                     src={item.imageUrl}
                                     alt={item.title}
-                                    width={64}
-                                    height={64}
-                                    className="w-full h-full object-cover rounded-lg border border-gray-200"
+                                    width={48}
+                                    height={48}
+                                    className="w-12 h-12 object-cover rounded border border-gray-200"
                                   />
-                                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                     {item.quantity}
                                   </span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-medium text-gray-900 truncate">
+                                  <h4 className="font-medium text-sm truncate">
                                     {item.title}
                                   </h4>
-                                  <p className="text-sm text-gray-500">
-                                    KES {item.price.toFixed(2)} each
+                                  <p className="text-gray-500 text-sm">
+                                    KES {item.price.toFixed(2)}
                                   </p>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                  <span className="font-semibold text-blue-600">
+                                  <p className="font-semibold text-blue-600 text-sm">
                                     KES{" "}
                                     {(item.price * item.quantity).toFixed(2)}
-                                  </span>
+                                  </p>
                                   <button
                                     onClick={() =>
                                       dispatch({
@@ -221,12 +216,12 @@ const Navbar = () => {
                                         productId: item.id,
                                       })
                                     }
-                                    className="text-xs text-red-500 hover:text-red-700 mt-1"
+                                    className="text-xs text-red-500 hover:text-red-700"
                                   >
                                     Remove
                                   </button>
                                 </div>
-                              </motion.div>
+                              </div>
                             ))}
                           </div>
                         )}
@@ -234,12 +229,10 @@ const Navbar = () => {
 
                       {/* Cart Footer */}
                       {state.items.length > 0 && (
-                        <div className="border-t border-gray-200 p-4 bg-gray-50">
-                          <div className="flex justify-between items-center mb-4">
-                            <span className="font-medium text-gray-700">
-                              Subtotal:
-                            </span>
-                            <span className="font-bold text-lg text-blue-600">
+                        <div className="border-t border-gray-200 p-3 bg-gray-50 rounded-b-lg">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="font-medium">Subtotal:</span>
+                            <span className="font-bold text-blue-600">
                               KES{" "}
                               {state.items
                                 .reduce(
@@ -250,17 +243,17 @@ const Navbar = () => {
                                 .toFixed(2)}
                             </span>
                           </div>
-                          <div className="flex justify-between gap-3">
+                          <div className="grid grid-cols-2 gap-2">
                             <button
                               onClick={handleClearCart}
-                              className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-2 px-4 rounded-lg border border-gray-300 text-sm font-medium transition-colors"
+                              className="text-sm bg-white border border-gray-300 hover:bg-gray-50 rounded px-3 py-2"
                             >
                               Clear All
                             </button>
                             <Link
                               href="/checkout"
-                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium text-center transition-colors"
                               onClick={() => setCartOpen(false)}
+                              className="text-sm bg-blue-600 hover:bg-blue-700 text-white text-center rounded px-3 py-2"
                             >
                               Checkout
                             </Link>
@@ -279,33 +272,46 @@ const Navbar = () => {
                     <Image
                       src={userImg}
                       alt="User profile"
-                      width={40}
-                      height={40}
+                      width={32}
+                      height={32}
                       className="object-cover"
                     />
                   </div>
                 }
               >
-                <div className="py-2 px-4 flex flex-col gap-2">
-                  <h3 className="text-sm">
+                <div className="py-2 px-3 w-48">
+                  <div className="px-2 py-1 text-sm text-gray-500 border-b border-gray-100 mb-2">
                     Signed in as{" "}
-                    <span className="font-medium">{user.given_name}</span>
-                  </h3>
+                    <span className="font-medium text-gray-700">
+                      {user.given_name}
+                    </span>
+                  </div>
                   <Link
-                    href="/user/dashboard"
-                    className='text-sm text-blue-600 hover:text-blue-800'
-                    onClick={() => setMobileMenuOpen(false)}
+                    href="/user/profile"
+                    className="block px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    onClick={() => setCartOpen(false)}
                   >
-                    User Dashboard
+                    My Profile
                   </Link>
-                  <LogoutLink
-                    className={buttonVariants({
-                      variant: "destructive",
-                      size: "sm",
-                    })}
+                  <Link
+                    href="/user/orders"
+                    className="block px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    onClick={() => setCartOpen(false)}
                   >
-                    Logout
-                  </LogoutLink>
+                    My Orders
+                  </Link>
+                  <Link
+                    href="/user/settings"
+                    className="block px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <div className="border-t border-gray-100 mt-2 pt-2">
+                    <LogoutLink className="block px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded w-full text-left">
+                      Sign Out
+                    </LogoutLink>
+                  </div>
                 </div>
               </CustomDropdown>
             </>
@@ -325,7 +331,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Shopping Cart (visible on mobile) */}
+        {/* Mobile Shopping Cart */}
         {user && (
           <button
             onClick={() => setCartOpen(!cartOpen)}
@@ -333,7 +339,7 @@ const Navbar = () => {
             aria-label="Shopping cart"
           >
             <FiShoppingBag className="text-xl text-gray-700" />
-            {state.items.length > 0 && (
+            {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
@@ -341,6 +347,26 @@ const Navbar = () => {
           </button>
         )}
       </div>
+
+      {/* Mobile Search Bar */}
+      {searchOpen && (
+        <div className="md:hidden mt-3 px-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              autoFocus
+            />
+            <button
+              onClick={() => setSearchOpen(false)}
+              className="absolute right-3 top-2.5 text-gray-400"
+            >
+              <FiX className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -350,7 +376,6 @@ const Navbar = () => {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed inset-0 top-16 bg-white z-30 md:hidden overflow-y-auto"
           >
             <div className="px-4 pt-2 pb-8 space-y-4">
@@ -363,25 +388,18 @@ const Navbar = () => {
                   Home
                 </NavLink>
                 <NavLink
+                  href="/products"
+                  mobile
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Marketplace
+                </NavLink>
+                <NavLink
                   href="/dashboard"
                   mobile
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
-                </NavLink>
-                <NavLink
-                  href="/products"
-                  mobile
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  MarketPlace
-                </NavLink>
-                <NavLink
-                  href="/my-products"
-                  mobile
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  My Products
                 </NavLink>
               </div>
 
@@ -426,7 +444,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Cart Modal */}
+      {/* Mobile Cart Drawer */}
       <AnimatePresence>
         {cartOpen && (
           <motion.div
@@ -442,107 +460,84 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="w-full max-w-sm bg-white h-full overflow-y-auto"
+              className="w-full max-w-sm bg-white h-full flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Mobile cart content (same as desktop but full height) */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white sticky top-0 z-10">
-                <div className="flex justify-between items-center">
-                  <button
-                    onClick={() => setCartOpen(false)}
-                    className="p-1 rounded-full hover:bg-white/20"
-                  >
-                    <FiX className="h-5 w-5" />
-                  </button>
-                  <h3 className="text-xl font-bold flex items-center gap-2">
-                    <FiShoppingBag className="text-white" />
-                    Your Cart
-                  </h3>
-                  <span className="bg-white/20 px-2 py-1 rounded-full text-xs font-semibold">
-                    {cartCount} {cartCount === 1 ? "item" : "items"}
-                  </span>
-                </div>
+              {/* Cart header */}
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white flex justify-between items-center">
+                <h3 className="text-xl font-bold">Your Cart ({cartCount})</h3>
+                <button
+                  onClick={() => setCartOpen(false)}
+                  className="p-1 rounded-full hover:bg-white/20"
+                >
+                  <FiX className="h-5 w-5" />
+                </button>
               </div>
 
-              {/* Cart Items */}
-              <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+              {/* Cart items */}
+              <div className="flex-1 overflow-y-auto p-4">
                 {state.items.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                      <FiShoppingBag className="text-blue-500 text-2xl" />
-                    </div>
+                  <div className="text-center py-8">
+                    <FiShoppingBag className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                     <p className="text-gray-600 font-medium">
                       Your cart is empty
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Start shopping to add items
-                    </p>
                     <Link
                       href="/products"
-                      className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg"
                       onClick={() => setCartOpen(false)}
                     >
                       Browse Products
                     </Link>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="space-y-4">
                     {state.items.map((item) => (
-                      <motion.div
+                      <div
                         key={item.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="flex items-center gap-4 p-4 hover:bg-blue-50/50 transition-colors"
+                        className="flex gap-3 p-2 border-b border-gray-100"
                       >
-                        <div className="relative w-16 h-16 flex-shrink-0">
+                        <div className="relative w-16 h-16">
                           <Image
                             src={item.imageUrl}
                             alt={item.title}
                             width={64}
                             height={64}
-                            className="w-full h-full object-cover rounded-lg border border-gray-200"
+                            className="rounded-lg object-cover"
                           />
-                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                             {item.quantity}
                           </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">
-                            {item.title}
-                          </h4>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{item.title}</h4>
                           <p className="text-sm text-gray-500">
-                            KES {item.price.toFixed(2)} each
+                            KES {item.price}
                           </p>
                         </div>
-                        <div className="flex flex-col items-end">
-                          <span className="font-semibold text-blue-600">
-                            KES {(item.price * item.quantity).toFixed(2)}
-                          </span>
-                          <button
-                            onClick={() =>
-                              dispatch({
-                                type: "REMOVE_ITEM",
-                                productId: item.id,
-                              })
-                            }
-                            className="text-xs text-red-500 hover:text-red-700 mt-1"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </motion.div>
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "REMOVE_ITEM",
+                              productId: item.id,
+                            })
+                          }
+                          className="text-red-500 text-sm"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Cart Footer */}
+              {/* Cart footer */}
               {state.items.length > 0 && (
-                <div className="border-t border-gray-200 p-4 bg-gray-50 sticky bottom-0">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="font-medium text-gray-700">Subtotal:</span>
-                    <span className="font-bold text-lg text-blue-600">
+                <div className="border-t border-gray-200 p-4 bg-gray-50">
+                  <div className="flex justify-between mb-4">
+                    <span>Subtotal:</span>
+                    <span className="font-bold">
                       KES{" "}
                       {state.items
                         .reduce(
@@ -552,16 +547,16 @@ const Navbar = () => {
                         .toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={handleClearCart}
-                      className="flex-1 bg-white hover:bg-gray-100 text-gray-700 py-2 px-4 rounded-lg border border-gray-300 text-sm font-medium transition-colors"
+                      className="bg-white border border-gray-300 rounded-lg py-2 px-4 text-sm"
                     >
                       Clear All
                     </button>
                     <Link
                       href="/checkout"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium text-center transition-colors"
+                      className="bg-blue-600 text-white rounded-lg py-2 px-4 text-sm text-center"
                       onClick={() => setCartOpen(false)}
                     >
                       Checkout
