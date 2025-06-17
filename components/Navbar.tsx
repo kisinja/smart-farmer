@@ -378,60 +378,79 @@ const Navbar = () => {
             exit={{ opacity: 0, x: "100%" }}
             className="fixed inset-0 top-16 bg-white z-30 md:hidden overflow-y-auto"
           >
-            <div className="px-4 pt-2 pb-8 space-y-4">
-              <div className="flex flex-col space-y-2">
-                <NavLink
+            <div className="px-4 pt-4 pb-8 space-y-6">
+              {/* Mobile Navigation Links */}
+              <div className="flex flex-col space-y-4">
+                <Link
                   href="/"
-                  mobile
+                  className="text-lg font-medium text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
-                </NavLink>
-                <NavLink
+                </Link>
+                <Link
                   href="/products"
-                  mobile
+                  className="text-lg font-medium text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Marketplace
-                </NavLink>
-                <NavLink
+                </Link>
+                <Link
                   href="/dashboard"
-                  mobile
+                  className="text-lg font-medium text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
-                </NavLink>
+                </Link>
+                {user && (
+                  <Link
+                    href="/user/profile"
+                    className="text-lg font-medium text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                )}
               </div>
 
-              <div className="pt-4 border-t border-gray-200">
+              {/* User Section */}
+              <div className="pt-6 border-t border-gray-200">
                 {user ? (
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 relative rounded-full overflow-hidden border-2 border-blue-500">
-                      <Image
-                        src={userImg}
-                        alt="User profile"
-                        width={40}
-                        height={40}
-                        className="object-cover"
-                      />
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 relative rounded-full overflow-hidden border-2 border-blue-500">
+                        <Image
+                          src={userImg}
+                          alt="User profile"
+                          width={48}
+                          height={48}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {user.given_name}
+                        </p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{user.given_name}</p>
-                      <LogoutLink className="text-sm text-red-500 hover:text-red-700">
-                        Logout
-                      </LogoutLink>
-                    </div>
+                    <LogoutLink
+                      className="w-full text-center bg-red-50 text-red-600 hover:bg-red-100 px-4 py-3 rounded-lg font-medium transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Sign Out
+                    </LogoutLink>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
                     <LoginLink
-                      className={buttonVariants({ variant: "default" })}
+                      className="w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Login
                     </LoginLink>
                     <RegisterLink
-                      className={buttonVariants({ variant: "outline" })}
+                      className="w-full text-center bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 px-4 py-3 rounded-lg font-medium transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign Up
@@ -440,131 +459,6 @@ const Navbar = () => {
                 )}
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Cart Drawer */}
-      <AnimatePresence>
-        {cartOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-end md:hidden"
-            onClick={() => setCartOpen(false)}
-          >
-            <motion.div
-              ref={cartRef}
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="w-full max-w-sm bg-white h-full flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Cart header */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white flex justify-between items-center">
-                <h3 className="text-xl font-bold">Your Cart ({cartCount})</h3>
-                <button
-                  onClick={() => setCartOpen(false)}
-                  className="p-1 rounded-full hover:bg-white/20"
-                >
-                  <FiX className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Cart items */}
-              <div className="flex-1 overflow-y-auto p-4">
-                {state.items.length === 0 ? (
-                  <div className="text-center py-8">
-                    <FiShoppingBag className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-600 font-medium">
-                      Your cart is empty
-                    </p>
-                    <Link
-                      href="/products"
-                      className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg"
-                      onClick={() => setCartOpen(false)}
-                    >
-                      Browse Products
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {state.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex gap-3 p-2 border-b border-gray-100"
-                      >
-                        <div className="relative w-16 h-16">
-                          <Image
-                            src={item.imageUrl}
-                            alt={item.title}
-                            width={64}
-                            height={64}
-                            className="rounded-lg object-cover"
-                          />
-                          <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            {item.quantity}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">{item.title}</h4>
-                          <p className="text-sm text-gray-500">
-                            KES {item.price}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() =>
-                            dispatch({
-                              type: "REMOVE_ITEM",
-                              productId: item.id,
-                            })
-                          }
-                          className="text-red-500 text-sm"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Cart footer */}
-              {state.items.length > 0 && (
-                <div className="border-t border-gray-200 p-4 bg-gray-50">
-                  <div className="flex justify-between mb-4">
-                    <span>Subtotal:</span>
-                    <span className="font-bold">
-                      KES{" "}
-                      {state.items
-                        .reduce(
-                          (total, item) => total + item.price * item.quantity,
-                          0
-                        )
-                        .toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={handleClearCart}
-                      className="bg-white border border-gray-300 rounded-lg py-2 px-4 text-sm"
-                    >
-                      Clear All
-                    </button>
-                    <Link
-                      href="/checkout"
-                      className="bg-blue-600 text-white rounded-lg py-2 px-4 text-sm text-center"
-                      onClick={() => setCartOpen(false)}
-                    >
-                      Checkout
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
