@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import myPrismaClient from "@/utils/connect";
-import { getKindeServerSessio } from "@kinde-oss/kinde-auth-nextjs/server";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function GET() {
   const { getUser } = getKindeServerSession();
